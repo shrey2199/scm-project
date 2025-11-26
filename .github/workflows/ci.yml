@@ -1,0 +1,148 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Backend Dependencies
+        run: cd backend && npm ci
+        
+      - name: Lint Backend
+        run: cd backend && npm run lint
+        
+      - name: Install Frontend Dependencies
+        run: cd frontend && npm ci
+        
+      - name: Lint Frontend
+        run: cd frontend && npm run lint
+
+  test:
+    name: Testing
+    needs: quality
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Backend Dependencies
+        run: cd backend && npm ci
+        
+      - name: Test Backend
+        run: cd backend && npm test
+        env:
+          MONGO_URL_TEST: mongodb://localhost:27017/todo-app-test
+        
+      - name: Install Frontend Dependencies
+        run: cd frontend && npm ci
+        
+      - name: Test Frontend
+        run: cd frontend && npm test
+
+  build:
+    name: Build & Containerize
+    needs: test
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Build Backend Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: false
+          tags: todo-backend:latest
+          outputs: type=docker,dest=/tmp/backend-image.tar
+          
+      - name: Build Frontend Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: false
+          tags: todo-frontend:latest
+          outputs: type=docker,dest=/tmp/frontend-image.tar
+          
+      - name: Upload Backend Image Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-image
+          path: /tmp/backend-image.tar
+          
+      - name: Upload Frontend Image Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-image
+          path: /tmp/frontend-image.tar
+
+  security:
+    name: Security Scan
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download Backend Image Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-image
+          path: /tmp
+          
+      - name: Load Backend Image
+        run: docker load --input /tmp/backend-image.tar
+        
+      - name: Run Trivy Vulnerability Scanner (Backend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'todo-backend:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          
+      - name: Download Frontend Image Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-image
+          path: /tmp
+          
+      - name: Load Frontend Image
+        run: docker load --input /tmp/frontend-image.tar
+          
+      - name: Run Trivy Vulnerability Scanner (Frontend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'todo-frontend:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
