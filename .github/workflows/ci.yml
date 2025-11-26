@@ -91,13 +91,13 @@ jobs:
           outputs: type=docker,dest=/tmp/frontend-image.tar
           
       - name: Upload Backend Image Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-image
           path: /tmp/backend-image.tar
           
       - name: Upload Frontend Image Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-image
           path: /tmp/frontend-image.tar
@@ -110,7 +110,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Download Backend Image Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend-image
           path: /tmp
@@ -129,7 +129,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           
       - name: Download Frontend Image Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-image
           path: /tmp
