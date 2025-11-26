@@ -9,7 +9,7 @@ A full-stack Todo application built with the MERN stack (MongoDB, Express, React
 - **Containerized**: Fully Dockerized with `docker-compose` for easy orchestration.
 - **CI/CD**: Automated pipeline for Linting, Testing, Building, and Security Scanning.
 - **Code Quality**: Enforced via ESLint and Prettier.
-- **Security**: Vulnerability scanning with Trivy.
+- **Security**: Vulnerability scanning with `npm audit`.
 
 ## 🛠️ Tech Stack
 
@@ -91,7 +91,7 @@ This project uses **GitHub Actions** for Continuous Integration and Deployment. 
 2.  **Testing**: Runs unit and integration tests for both Frontend and Backend.
     - *Note: Uses a temporary MongoDB service container for backend tests.*
 3.  **Build & Containerize**: Builds Docker images for the application.
-4.  **Security Scan**: Scans the built Docker images for vulnerabilities using **Trivy**.
+4.  **Security Scan**: Scans dependencies for vulnerabilities using **npm audit**.
 
 ## 📂 Project Structure
 
