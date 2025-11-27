@@ -1,34 +1,50 @@
-# MERN Stack Todo App with CI/CD & Docker
+# DevOps-Driven MERN Stack Project
 
-A full-stack Todo application built with the MERN stack (MongoDB, Express, React, Node.js), featuring a complete CI/CD pipeline using GitHub Actions and containerization with Docker.
+A production-ready MERN stack application designed with a **DevOps-First** approach. This project demonstrates a complete software supply chain implementation, featuring automated CI/CD pipelines, container orchestration, security scanning, and real-time observability.
 
-## 🚀 Features
+## 🚀 Key DevOps Features
 
-- **Full Stack**: React frontend + Node.js/Express backend + MongoDB database.
-- **Modern UI**: "Rich Aesthetics" design with dark mode and animations.
-- **Containerized**: Fully Dockerized with `docker-compose` for easy orchestration.
-- **CI/CD**: Automated pipeline for Linting, Testing, Building, and Security Scanning.
-- **Code Quality**: Enforced via ESLint and Prettier.
-- **Security**: Vulnerability scanning with `npm audit`.
+### 1. 🔄 CI/CD Pipeline (GitHub Actions)
+A robust pipeline defined in `.github/workflows/ci.yml` that ensures code reliability and security:
+-   **Code Quality**: Automated linting with **ESLint** and formatting with **Prettier**.
+-   **Automated Testing**: Runs Unit and Integration tests for Backend (Jest/Supertest) and Frontend (Jest/React Testing Library).
+-   **Security Scanning**: Automated dependency vulnerability auditing using **npm audit**.
+-   **Containerization**: Builds Docker images for both services.
+
+### 2. 🐳 Containerization & Orchestration
+-   **Docker**: Multi-stage builds for optimized image sizes.
+-   **Docker Compose**: Orchestrates the entire stack including:
+    -   **Backend**: Node.js/Express API.
+    -   **Frontend**: React/Vite UI.
+    -   **Database**: MongoDB with persistent volume storage.
+    -   **Monitoring Stack**: Prometheus and Grafana.
+
+### 3. 📊 Observability & Monitoring
+Real-time insights into application performance:
+-   **Prometheus**: Scrapes metrics from the backend API (via `express-prom-bundle`).
+-   **Grafana**: Visualizes metrics with custom dashboards (accessible on port `3100`).
+-   **Metrics Exposed**: Request duration, error rates, system memory, and CPU usage.
+
+### 4. 🛡️ Security
+-   **Dependency Auditing**: Automated checks for vulnerable packages during CI.
+-   **Secure Configuration**: Environment variables management for sensitive data.
+-   **Network Isolation**: Docker Compose bridge network isolates services.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, Vite, Axios, CSS3
-- **Backend**: Node.js, Express.js, Mongoose
-- **Database**: MongoDB
-- **DevOps**: Docker, Docker Compose, GitHub Actions
+| Category | Technologies |
+|----------|--------------|
+| **CI/CD** | GitHub Actions |
+| **Containerization** | Docker, Docker Compose |
+| **Monitoring** | Prometheus, Grafana |
+| **Backend** | Node.js, Express, Mongoose |
+| **Frontend** | React, Vite, Tailwind-like CSS |
+| **Database** | MongoDB |
+| **Testing** | Jest, Supertest, React Testing Library |
 
-## 📋 Prerequisites
+## 🏃‍♂️ Quick Start (DevOps Mode)
 
-- Node.js (v18+)
-- Docker & Docker Compose
-- Git
-
-## 🏃‍♂️ Getting Started
-
-### Option 1: Using Docker (Recommended)
-
-The easiest way to run the application is using Docker Compose.
+The entire environment is containerized. You only need Docker and Docker Compose.
 
 1.  **Clone the repository:**
     ```bash
@@ -36,83 +52,41 @@ The easiest way to run the application is using Docker Compose.
     cd <repository-name>
     ```
 
-2.  **Build and Run:**
+2.  **Spin up the Infrastructure:**
     ```bash
     docker-compose up --build
     ```
 
-3.  **Access the App:**
-    - Frontend: `http://localhost`
-    - Backend API: `http://localhost:5000`
+3.  **Access Services:**
+    | Service | URL | Credentials |
+    |---------|-----|-------------|
+    | **Frontend App** | `http://localhost` | - |
+    | **Backend API** | `http://localhost:5000` | - |
+    | **Grafana** | `http://localhost:3100` | `admin` / `admin` |
+    | **Prometheus** | `http://localhost:9090` | - |
 
-### Option 2: Running Locally
+## 🧪 Testing & Verification
 
-If you want to run the services individually without Docker.
-
-1.  **Backend Setup:**
-    ```bash
-    cd backend
-    npm install
-    # Ensure you have a local MongoDB instance running or update .env
-    npm run dev
-    ```
-
-2.  **Frontend Setup:**
-    ```bash
-    cd frontend
-    npm install
-    npm run dev
-    ```
-
-3.  **Access the App:**
-    - Frontend: `http://localhost:5173`
-    - Backend: `http://localhost:5000`
-
-## 🧪 Running Tests
-
-### Backend
+### Run Tests Locally
 ```bash
-cd backend
-npm test
+# Backend Integration Tests
+cd backend && npm test
+
+# Frontend Unit Tests
+cd frontend && npm test
 ```
 
-### Frontend
-```bash
-cd frontend
-npm test
-```
-
-## 🔄 CI/CD Pipeline
-
-This project uses **GitHub Actions** for Continuous Integration and Deployment. The workflow is defined in `.github/workflows/ci.yml`.
-
-**Pipeline Stages:**
-1.  **Code Quality**: Runs ESLint and Prettier to ensure code style.
-2.  **Testing**: Runs unit and integration tests for both Frontend and Backend.
-    - *Note: Uses a temporary MongoDB service container for backend tests.*
-3.  **Build & Containerize**: Builds Docker images for the application.
-4.  **Security Scan**: Scans dependencies for vulnerabilities using **npm audit**.
+### Verify Metrics
+1.  Generate some traffic by using the Todo App.
+2.  Visit `http://localhost:5000/metrics` to see raw Prometheus metrics.
+3.  Open Grafana at `http://localhost:3100` to view visualizations.
 
 ## 📂 Project Structure
 
 ```
-├── backend/                # Node.js/Express Backend
-│   ├── controllers/        # Request handlers
-│   ├── models/             # Mongoose models
-│   ├── routes/             # API routes
-│   ├── tests/              # Jest tests
-│   ├── Dockerfile          # Backend Docker config
-│   └── server.js           # Entry point
-│
-├── frontend/               # React/Vite Frontend
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   └── App.jsx         # Main component
-│   ├── Dockerfile          # Frontend Docker config
-│   └── vite.config.js      # Vite config
-│
-├── .github/workflows/      # CI/CD Configuration
-│   └── ci.yml              # GitHub Actions Workflow
-│
-└── docker-compose.yml      # Docker Orchestration
+├── .github/workflows/  # CI/CD Pipeline Definition
+├── monitoring/         # Prometheus Configuration
+├── backend/            # Backend Source + Dockerfile
+├── frontend/           # Frontend Source + Dockerfile
+└── docker-compose.yml  # Infrastructure as Code
 ```
