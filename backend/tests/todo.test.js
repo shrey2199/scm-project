@@ -1,15 +1,10 @@
 const request = require('supertest');
-const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const todoRoutes = require('../routes/todoRoutes');
+const app = require('../app');
 const Todo = require('../models/Todo');
 
 dotenv.config();
-
-const app = express();
-app.use(express.json());
-app.use('/api/todos', todoRoutes);
 
 // Connect to a test database
 beforeAll(async () => {
